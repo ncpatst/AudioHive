@@ -1,13 +1,13 @@
 const express = require('express')
 const app = express()
-const port = 1853
+const port = 1856
 const path = require('path') 
 const bodyParser = require('body-parser')
 const MongoClient = require('mongodb').MongoClient
 const assert = require('assert')
 const url = 'mongodb://localhost:27017'
 const fs = require("fs");
-const dbName = 'Night_Studio_Signup'
+const dbName = 'AudioHive_Signup'
 const CronJob = require('cron').CronJob;
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -300,7 +300,7 @@ app.get('/cancelSubmit', function(req, res) {
 			if (result.length > 0) {
 				if (result[0].Name == firstName + " " + lastName && result[0].Grade == grade) {
 					dbDelete({Verification_Code: cancelCode})
-					res.render('infoPanel.ejs', {message: "Your Night Studio session has been cancelled."})// res.render('cancelSubmit.ejs', {})
+					res.render('infoPanel.ejs', {message: "Your AudioHive session has been cancelled."})// res.render('cancelSubmit.ejs', {})
 				} else {
 					res.render('error.ejs', {message: "please correct your name and/or grade and try again."})
 				}

@@ -1,7 +1,7 @@
 {
-  "name": "night_studio_signup",
+  "name": "audiohive_signup",
   "version": "1.0.0",
-  "description": "Web sign up system for the Night Studio students, intended to digitize the sign up process. Initial version finished on 16th, September, 2018.",
+  "description": "Web sign up system for the AudioHive students, intended to digitize the sign up process. Based on the Night Studio sign up system.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
