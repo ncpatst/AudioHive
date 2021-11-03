@@ -21,7 +21,7 @@ var maxPeople = 1 // This value should at least be 1 (>=1)
 
 
 // New time system 2020
-const openHour = 06 //the hour when signup opens; 0 <= openHour <= 23
+const openHour = 08 //the hour when signup opens; 0 <= openHour <= 23
 const openMin = 00 //the minute when signup opens; 0 <= openMin <= 59
 const closeHour = 16 //the hour when signup closes; 0 <= closeHour <= 23
 const closeMin = 30 //the minute when signup closes; 0 <= closeMin <= 59
