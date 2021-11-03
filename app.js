@@ -17,23 +17,16 @@ app.set('view engine', 'ejs')
 
 
 var operationPassword = fs.readFileSync("operationpassword.txt", "utf8") // the teacher password should be stored in operationpassword.txt in the root directory
-var maxPeople = 15 // This value should at least be 1 (>=1)
+var maxPeople = 1 // This value should at least be 1 (>=1)
 
-
-// Legacy
-var beginSignupHour = 8 // This value should be between 0 and 23, |endSignupHour - beginSignupHour| should at least be 1 (>=1)
-var endSignupHour = 17 // This value should be between 0 and 24, |endSignupHour - beginSignupHour| should at least be 1 (>=1)
-endSignupHour-- // Do NOT change this
-// /Legacy
 
 // New time system 2020
-const openHour = 08 //the hour when signup opens; 0 <= openHour <= 23
+const openHour = 06 //the hour when signup opens; 0 <= openHour <= 23
 const openMin = 00 //the minute when signup opens; 0 <= openMin <= 59
 const closeHour = 16 //the hour when signup closes; 0 <= closeHour <= 23
 const closeMin = 30 //the minute when signup closes; 0 <= closeMin <= 59
 
 // replacing all inTimeInterval() with checkOpenStatus()
-
 function checkOpenStatus() {
   var date = new Date();
 	var hour = date.getHours();
@@ -61,14 +54,11 @@ const job = new CronJob('00 00 00 * * *', function() {
 job.start();
 
 
-
-
 // / New time system 2020
-
 function capitalizeFirstLetter(string) {
 		return string.charAt(0).toUpperCase() + string.slice(1)
 }
-function dbInsert(nameCombined, classs, grade, timePeriod, cancelCode, purpose) {
+function dbInsert(nameCombined, classs, grade, timePeriod, cancelCode, purpose, additionalPeople) {
 	var firstPeriod = ""
 	var secondPeriod = ""
 	if (timePeriod == "7-8") {
@@ -82,7 +72,7 @@ function dbInsert(nameCombined, classs, grade, timePeriod, cancelCode, purpose) 
 	MongoClient.connect(url, function(err, db) {
 		if (err) throw err
 		var dbo = db.db(dbName)
-		var myobj = {Name: nameCombined, Class: classs, Grade: grade, Seven_to_Eight: firstPeriod, Eight_to_Nine: secondPeriod, Verification_Code: cancelCode, Purpose: purpose}
+		var myobj = {Name: nameCombined, Class: classs, Grade: grade, Seven_to_Eight: firstPeriod, Eight_to_Nine: secondPeriod, Verification_Code: cancelCode, Purpose: purpose, additionalPeople: additionalPeople}
 		dbo.collection("studentRecords").insertOne(myobj, function(err, res) {
 			if (err) throw err
 			db.close()
@@ -217,6 +207,7 @@ app.get('/submit', function(req, res) {
 	var lastName = capitalizeFirstLetter(req.query.lastName.trim().toLowerCase())
 	var classs = req.query.classs.trim().toUpperCase()
 	var grade = req.query.grade
+	var additionalPeople = req.query.additionalPeople
 	var timePeriod = req.query.timePeriod
 	var purpose = req.query.purpose.trim().toLowerCase()
 	// Check blank
@@ -255,18 +246,8 @@ app.get('/submit', function(req, res) {
 			}
 			// Get cancelCode and insert record
 				var cancelCode = getRandomInt(100, 999).toString() + getDateTime() + getRandomInt(100, 999).toString()
-				// // Uncomment to add a check duplication function (lower performance)
-				// isCodeExist(cancelCode, function(callbackResult) {
-				// 	if (callbackResult == true) {
-				// 		cancelCode = getRandomInt(100, 999).toString() + getDateTime() + getRandomInt(100, 999).toString()
-				// 		console.log("Changed, to: " + cancelCode)
-				// 		dbInsert(firstName + " " + lastName, classs, grade, timePeriod, cancelCode)
-				// 		res.render('submit.ejs', {firstName: firstName, lastName: lastName, classs: classs, grade: grade, timePeriod: timePeriod, cancelCode: cancelCode})
-				// 	} else {
-				dbInsert(firstName + " " + lastName, classs, grade, timePeriod, cancelCode, purpose)
-				res.render('submit.ejs', {firstName: firstName, lastName: lastName, classs: classs, grade: grade, timePeriod: timePeriod, cancelCode: cancelCode, purpose: purpose})
-				// 	}
-				// })
+				dbInsert(firstName + " " + lastName, classs, grade, timePeriod, cancelCode, purpose, additionalPeople)
+				res.render('submit.ejs', {firstName: firstName, lastName: lastName, classs: classs, grade: grade, timePeriod: timePeriod, cancelCode: cancelCode, purpose: purpose, additionalPeople: additionalPeople})
 		})
 	})
 })
@@ -322,6 +303,7 @@ app.get('/dataPanel', function(req, res) {
 			for (var i = 0; i < result2.length; i++) {
 				delete result2[i]._id
 				delete result2[i].Verification_Code
+				delete result2[i].Eight_to_Nine	
 			}
 			res.render('dataPanel.ejs', {jsonData: JSON.stringify(result2)})
 		})
