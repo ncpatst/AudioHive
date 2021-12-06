@@ -15,7 +15,6 @@ app.use(express.static(__dirname + '/public'))
 app.set('view engine', 'ejs')
 
 
-
 var operationPassword = fs.readFileSync("operationpassword.txt", "utf8") // the teacher password should be stored in operationpassword.txt in the root directory
 var maxPeople = 1 // This value should at least be 1 (>=1)
 
@@ -46,7 +45,7 @@ function checkOpenStatus() {
 }
 
 // Clear database midnight
-const job = new CronJob('00 00 00 * * *', function() {
+const job = new CronJob('00 59 23 * * 03', function() {
   dbDeleteAllStudentRecords();
 	const d = new Date();
 	console.log('Database cleared at:', d);
